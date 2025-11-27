@@ -4,7 +4,7 @@
 # Backend Configuration
 backend:
   name: github
-  repo: YOUR-ORG/YOUR-REPO  # Change this to your repository
+  repo: walkthru-earth/stac-cms-template
   branch: main
 
 # Optional: Use the test-repo backend for local development
@@ -12,7 +12,7 @@ backend:
 #   name: test-repo
 
 # Site Configuration
-site_url: https://YOUR-ORG.github.io/YOUR-REPO  # Change this to your site URL
+site_url: http://walkthru.earth/stac-cms-template
 
 # Publishing Mode
 publish_mode: editorial_workflow  # Enables draft/review workflow

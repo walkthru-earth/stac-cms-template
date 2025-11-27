@@ -13,7 +13,7 @@
     },
     {
       "rel": "self",
-      "href": "http://localhost:8000/catalog.json",
+      "href": "http://walkthru.earth/stac-cms-template/catalog.json",
       "type": "application/json"
     },
     {

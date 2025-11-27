@@ -37,7 +37,7 @@
     },
     {
       "rel": "self",
-      "href": "http://localhost:8000/collections/example-collection.json",
+      "href": "http://walkthru.earth/stac-cms-template/collections/example-collection.json",
       "type": "application/json"
     },
     {
