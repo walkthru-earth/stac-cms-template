@@ -7,7 +7,7 @@
   "links": [
     {
       "rel": "root",
-      "href": "./catalog.json",
+      "href": "../catalog.json",
       "type": "application/json",
       "title": "Root catalog"
     },
@@ -18,7 +18,7 @@
     },
     {
       "rel": "child",
-      "href": "./collections/example-collection.json",
+      "href": "../collections/example-collection.json",
       "type": "application/json",
       "title": "Example Collection"
     }
