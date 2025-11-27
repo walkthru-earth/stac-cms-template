@@ -21,7 +21,7 @@ publish_mode: editorial_workflow  # Enables draft/review workflow
 
 # Media Configuration
 media_folder: assets
-public_folder: /assets
+public_folder: /stac-cms-template/assets
 
 # Collections Configuration
 collections:
@@ -209,7 +209,7 @@ collections:
                 required: true
                 hint: 'Upload an image or enter a URL'
                 media_folder: '/assets/visual'
-                public_folder: '/assets/visual'
+                public_folder: '/stac-cms-template/assets/visual'
               - { label: 'Title', name: 'title', widget: 'string', required: false }
               - { label: 'Description', name: 'description', widget: 'text', required: false }
               - { label: 'Media Type', name: 'type', widget: 'string', default: 'image/tiff', required: false }
@@ -233,7 +233,7 @@ collections:
                 required: true
                 hint: 'Upload an image or enter a URL'
                 media_folder: '/assets/thumbnails'
-                public_folder: '/assets/thumbnails'
+                public_folder: '/stac-cms-template/assets/thumbnails'
               - { label: 'Title', name: 'title', widget: 'string', default: 'Thumbnail', required: false }
               - { label: 'Description', name: 'description', widget: 'text', required: false }
               - { label: 'Media Type', name: 'type', widget: 'string', default: 'image/jpeg', required: false }

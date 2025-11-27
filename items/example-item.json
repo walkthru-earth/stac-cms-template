@@ -78,7 +78,7 @@
       ]
     },
     "thumbnail": {
-      "href": "/assets/small logo.png",
+      "href": "/stac-cms-template/assets/small logo.png",
       "title": "Thumbnail",
       "type": "image/png",
       "roles": [
