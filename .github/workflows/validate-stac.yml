@@ -81,8 +81,11 @@ jobs:
         run: |
           echo "📦 Creating STAC-compliant catalog structure..."
           if [ -f "catalog/root.json" ]; then
-            cp catalog/root.json catalog.json
-            echo "✅ Copied catalog/root.json → catalog.json"
+            # Copy and transform paths for root location
+            # Change ../catalog.json → ./catalog.json
+            # Change ../collections/ → ./collections/
+            sed 's|"\.\./catalog\.json"|"./catalog.json"|g; s|"\.\./collections/|"./collections/|g' catalog/root.json > catalog.json
+            echo "✅ Copied catalog/root.json → catalog.json (with path transformation)"
           fi
 
       - name: Commit catalog.json if changed
