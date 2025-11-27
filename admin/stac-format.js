@@ -8,7 +8,59 @@
  * The map widget in Sveltia CMS requires geometry to be a stringified GeoJSON,
  * but STAC spec requires it to be a proper JSON object. This format converter
  * transparently handles the transformation at the file boundary.
+ *
+ * Additional features:
+ * - Auto-calculates bbox from geometry (STAC best practice)
  */
+
+/**
+ * Calculate bounding box from GeoJSON geometry
+ * Returns [minLon, minLat, maxLon, maxLat]
+ *
+ * @param {Object} geometry - GeoJSON geometry object
+ * @returns {Array<number>|null} - Bbox array [minLon, minLat, maxLon, maxLat] or null
+ */
+const calculateBbox = (geometry) => {
+  if (!geometry || !geometry.coordinates) {
+    return null;
+  }
+
+  let allCoords = [];
+
+  // Flatten all coordinates from the geometry
+  const flattenCoords = (coords) => {
+    if (Array.isArray(coords)) {
+      if (typeof coords[0] === 'number') {
+        // This is a coordinate pair [lon, lat]
+        allCoords.push(coords);
+      } else {
+        // This is nested, recurse
+        coords.forEach(flattenCoords);
+      }
+    }
+  };
+
+  flattenCoords(geometry.coordinates);
+
+  if (allCoords.length === 0) {
+    return null;
+  }
+
+  // Calculate min/max
+  let minLon = allCoords[0][0];
+  let minLat = allCoords[0][1];
+  let maxLon = allCoords[0][0];
+  let maxLat = allCoords[0][1];
+
+  allCoords.forEach(([lon, lat]) => {
+    if (lon < minLon) minLon = lon;
+    if (lat < minLat) minLat = lat;
+    if (lon > maxLon) maxLon = lon;
+    if (lat > maxLat) maxLat = lat;
+  });
+
+  return [minLon, minLat, maxLon, maxLat];
+};
 
 /**
  * Parse STAC JSON file from Git storage format to CMS edit format
@@ -36,6 +88,7 @@ const fromFile = (text) => {
 /**
  * Format STAC JSON from CMS edit format to Git storage format
  * Converts: geometry string → geometry object (STAC compliant)
+ * Auto-calculates: bbox from geometry coordinates
  *
  * @param {Object} data - Entry data from CMS with geometry as string
  * @returns {string} - JSON string ready for Git with geometry as object
@@ -54,6 +107,15 @@ const toFile = (data) => {
       } catch (e) {
         console.error('❌ [STAC Format] Failed to parse geometry string:', e);
         // Keep as string if parsing fails
+      }
+    }
+
+    // Auto-calculate bbox from geometry (STAC best practice)
+    if (output.geometry && typeof output.geometry === 'object') {
+      const calculatedBbox = calculateBbox(output.geometry);
+      if (calculatedBbox) {
+        output.bbox = calculatedBbox;
+        console.log('📦 [STAC Format] Auto-calculated bbox:', calculatedBbox);
       }
     }
   }

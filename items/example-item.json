@@ -31,10 +31,10 @@
     ]
   },
   "bbox": [
-    -122.5,
-    37.7,
-    -122.4,
-    37.8
+    -30.9375,
+    -16.636192,
+    42.890625,
+    35.46067
   ],
   "properties": {
     "datetime": "2024-11-27T10:00:00Z",
@@ -64,7 +64,7 @@
     },
     {
       "rel": "self",
-      "href": "https://walkthru.earth/stac-cms-template/items/example-item.json",
+      "href": "./example-item.json",
       "type": "application/geo+json"
     }
   ],

@@ -83,10 +83,10 @@ collections:
       - label: 'Bounding Box'
         name: 'bbox'
         widget: 'list'
-        required: true
+        required: false
         min: 4
         max: 6
-        hint: 'Format: [minLon, minLat, maxLon, maxLat] or [minLon, minLat, minElev, maxLon, maxLat, maxElev]'
+        hint: '✨ AUTO-CALCULATED from geometry! You can override manually if needed. Format: [minLon, minLat, maxLon, maxLat]'
         summary: '[{{fields.coordinate}}]'
         field:
           label: 'Coordinate'
