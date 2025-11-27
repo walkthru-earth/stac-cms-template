@@ -198,7 +198,14 @@ collections:
             widget: 'object'
             required: false
             fields:
-              - { label: 'URL', name: 'href', widget: 'string', required: true }
+              - label: 'Image'
+                name: 'href'
+                widget: 'image'
+                choose_url: true
+                required: true
+                hint: 'Upload an image or enter a URL'
+                media_folder: '/assets/visual'
+                public_folder: '/assets/visual'
               - { label: 'Title', name: 'title', widget: 'string', required: false }
               - { label: 'Description', name: 'description', widget: 'text', required: false }
               - { label: 'Media Type', name: 'type', widget: 'string', default: 'image/tiff', required: false }
@@ -213,8 +220,15 @@ collections:
             widget: 'object'
             required: false
             fields:
-              - { label: 'URL', name: 'href', widget: 'string', required: true }
-              - { label: 'Title', name: 'title', widget: 'string', required: false }
+              - label: 'Image'
+                name: 'href'
+                widget: 'image'
+                choose_url: true
+                required: true
+                hint: 'Upload an image or enter a URL'
+                media_folder: '/assets/thumbnails'
+                public_folder: '/assets/thumbnails'
+              - { label: 'Title', name: 'title', widget: 'string', default: 'Thumbnail', required: false }
               - { label: 'Description', name: 'description', widget: 'text', required: false }
               - { label: 'Media Type', name: 'type', widget: 'string', default: 'image/jpeg', required: false }
               - label: 'Roles'
