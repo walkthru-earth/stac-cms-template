@@ -70,7 +70,7 @@
   ],
   "assets": {
     "visual": {
-      "href": "/assets/small logo.png",
+      "href": "/stac-cms-template/assets/small logo.png",
       "title": "Visual RGB Composite",
       "type": "image/jpeg",
       "roles": [
