@@ -1,0 +1,64 @@
+name: Validate STAC
+
+on:
+  pull_request:
+    paths:
+      - '**.json'
+  push:
+    branches:
+      - main
+    paths:
+      - '**.json'
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    name: Validate STAC JSON files
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install STAC validator
+        run: |
+          pip install stac-validator
+
+      - name: Validate STAC Items
+        run: |
+          echo "Validating STAC Items..."
+          for file in items/*.json; do
+            if [ -f "$file" ]; then
+              echo "Validating $file"
+              stac-validator "$file" || exit 1
+            fi
+          done
+
+      - name: Validate STAC Collections
+        run: |
+          echo "Validating STAC Collections..."
+          for file in collections/*.json; do
+            if [ -f "$file" ]; then
+              echo "Validating $file"
+              stac-validator "$file" || exit 1
+            fi
+          done
+
+      - name: Validate STAC Catalogs
+        run: |
+          echo "Validating STAC Catalogs..."
+          for file in catalog/*.json; do
+            if [ -f "$file" ]; then
+              echo "Validating $file"
+              stac-validator "$file" || exit 1
+            fi
+          done
+
+      - name: Validation successful
+        if: success()
+        run: |
+          echo "✅ All STAC files are valid!"

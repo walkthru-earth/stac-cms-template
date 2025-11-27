@@ -1,0 +1,481 @@
+# Sveltia CMS Configuration for STAC Metadata Authoring
+# Documentation: https://github.com/sveltia/sveltia-cms
+
+# Backend Configuration
+backend:
+  name: github
+  repo: YOUR-ORG/YOUR-REPO  # Change this to your repository
+  branch: main
+
+# Optional: Use the test-repo backend for local development
+# backend:
+#   name: test-repo
+
+# Site Configuration
+site_url: https://YOUR-ORG.github.io/YOUR-REPO  # Change this to your site URL
+
+# Publishing Mode
+publish_mode: editorial_workflow  # Enables draft/review workflow
+
+# Media Configuration
+media_folder: assets
+public_folder: /assets
+
+# Collections Configuration
+collections:
+  # ============================================
+  # STAC Items
+  # ============================================
+  - name: stac-items
+    label: 'STAC Items'
+    label_singular: 'STAC Item'
+    description: 'Geospatial asset metadata following the STAC Item specification'
+    folder: items
+    format: json
+    extension: json
+    create: true
+    slug: '{{id}}'
+    identifier_field: id
+    summary: '{{id}} - {{properties.title}} ({{properties.datetime}})'
+
+    fields:
+      # Core GeoJSON/STAC fields
+      - label: 'Type'
+        name: 'type'
+        widget: 'hidden'
+        default: 'Feature'
+
+      - label: 'STAC Version'
+        name: 'stac_version'
+        widget: 'hidden'
+        default: '1.1.0'
+
+      - label: 'STAC Extensions'
+        name: 'stac_extensions'
+        widget: 'list'
+        required: false
+        collapsed: true
+        hint: 'Optional: URLs to STAC extension JSON schemas'
+        field:
+          label: 'Extension URL'
+          name: 'extension'
+          widget: 'string'
+
+      - label: 'ID'
+        name: 'id'
+        widget: 'string'
+        required: true
+        hint: 'Unique identifier for this item'
+        pattern: ['^[a-zA-Z0-9_-]+$', 'Must contain only alphanumeric characters, hyphens, and underscores']
+
+      # Geometry - Using Sveltia's map widget with Leaflet
+      - label: 'Geometry'
+        name: 'geometry'
+        widget: 'map'
+        required: true
+        type: 'Polygon'  # Options: Point, LineString, Polygon, MultiPoint, MultiLineString, MultiPolygon
+        decimals: 6
+        hint: 'Draw the footprint of your geospatial asset on the map'
+
+      # Bounding Box
+      - label: 'Bounding Box'
+        name: 'bbox'
+        widget: 'list'
+        required: true
+        hint: 'Format: [minLon, minLat, maxLon, maxLat] or [minLon, minLat, minElev, maxLon, maxLat, maxElev]'
+        summary: '[{{fields.coordinate}}]'
+        field:
+          label: 'Coordinate'
+          name: 'coordinate'
+          widget: 'number'
+          value_type: 'float'
+          step: 0.000001
+
+      # Properties Object
+      - label: 'Properties'
+        name: 'properties'
+        widget: 'object'
+        required: true
+        collapsed: false
+        fields:
+          - label: 'Date & Time'
+            name: 'datetime'
+            widget: 'datetime'
+            required: true
+            format: 'YYYY-MM-DDTHH:mm:ssZ'
+            hint: 'Acquisition or creation date/time in UTC'
+
+          - label: 'Title'
+            name: 'title'
+            widget: 'string'
+            required: false
+            hint: 'Human-readable title'
+
+          - label: 'Description'
+            name: 'description'
+            widget: 'text'
+            required: false
+            hint: 'Detailed description of the asset'
+
+          - label: 'Start Date/Time'
+            name: 'start_datetime'
+            widget: 'datetime'
+            required: false
+            format: 'YYYY-MM-DDTHH:mm:ssZ'
+            hint: 'For time ranges, the start datetime'
+
+          - label: 'End Date/Time'
+            name: 'end_datetime'
+            widget: 'datetime'
+            required: false
+            format: 'YYYY-MM-DDTHH:mm:ssZ'
+            hint: 'For time ranges, the end datetime'
+
+          - label: 'Created Date'
+            name: 'created'
+            widget: 'datetime'
+            required: false
+            format: 'YYYY-MM-DDTHH:mm:ssZ'
+            hint: 'Creation date of the metadata'
+
+          - label: 'Updated Date'
+            name: 'updated'
+            widget: 'datetime'
+            required: false
+            format: 'YYYY-MM-DDTHH:mm:ssZ'
+            hint: 'Last update date of the metadata'
+
+      # Links Array
+      - label: 'Links'
+        name: 'links'
+        widget: 'list'
+        required: true
+        collapsed: false
+        summary: '{{fields.rel}}: {{fields.title}}'
+        hint: 'Links to related resources'
+        fields:
+          - label: 'Relation Type'
+            name: 'rel'
+            widget: 'select'
+            required: true
+            options:
+              - { label: 'Self', value: 'self' }
+              - { label: 'Root', value: 'root' }
+              - { label: 'Parent', value: 'parent' }
+              - { label: 'Collection', value: 'collection' }
+              - { label: 'Item', value: 'item' }
+              - { label: 'Derived From', value: 'derived_from' }
+              - { label: 'License', value: 'license' }
+
+          - label: 'URL'
+            name: 'href'
+            widget: 'string'
+            required: true
+
+          - label: 'Media Type'
+            name: 'type'
+            widget: 'string'
+            default: 'application/json'
+            required: false
+
+          - label: 'Title'
+            name: 'title'
+            widget: 'string'
+            required: false
+
+      # Assets Object (using key-value widget for better UX)
+      - label: 'Assets'
+        name: 'assets'
+        widget: 'object'
+        required: true
+        collapsed: false
+        hint: 'Downloadable assets (images, data files, etc.)'
+        fields:
+          - label: 'Visual Asset'
+            name: 'visual'
+            widget: 'object'
+            required: false
+            fields:
+              - { label: 'URL', name: 'href', widget: 'string', required: true }
+              - { label: 'Title', name: 'title', widget: 'string', required: false }
+              - { label: 'Description', name: 'description', widget: 'text', required: false }
+              - { label: 'Media Type', name: 'type', widget: 'string', default: 'image/tiff', required: false }
+              - label: 'Roles'
+                name: 'roles'
+                widget: 'list'
+                default: ['visual']
+                field: { label: 'Role', name: 'role', widget: 'string' }
+
+          - label: 'Thumbnail'
+            name: 'thumbnail'
+            widget: 'object'
+            required: false
+            fields:
+              - { label: 'URL', name: 'href', widget: 'string', required: true }
+              - { label: 'Title', name: 'title', widget: 'string', required: false }
+              - { label: 'Description', name: 'description', widget: 'text', required: false }
+              - { label: 'Media Type', name: 'type', widget: 'string', default: 'image/jpeg', required: false }
+              - label: 'Roles'
+                name: 'roles'
+                widget: 'list'
+                default: ['thumbnail']
+                field: { label: 'Role', name: 'role', widget: 'string' }
+
+          - label: 'Metadata'
+            name: 'metadata'
+            widget: 'object'
+            required: false
+            fields:
+              - { label: 'URL', name: 'href', widget: 'string', required: true }
+              - { label: 'Title', name: 'title', widget: 'string', required: false }
+              - { label: 'Description', name: 'description', widget: 'text', required: false }
+              - { label: 'Media Type', name: 'type', widget: 'string', default: 'application/xml', required: false }
+              - label: 'Roles'
+                name: 'roles'
+                widget: 'list'
+                default: ['metadata']
+                field: { label: 'Role', name: 'role', widget: 'string' }
+
+      # Collection Reference
+      - label: 'Collection'
+        name: 'collection'
+        widget: 'relation'
+        collection: 'stac-collections'
+        search_fields: ['id', 'title']
+        value_field: 'id'
+        display_fields: ['title']
+        required: false
+        hint: 'Link to the parent STAC Collection'
+
+  # ============================================
+  # STAC Collections
+  # ============================================
+  - name: stac-collections
+    label: 'STAC Collections'
+    label_singular: 'STAC Collection'
+    description: 'Groups of STAC Items with shared properties'
+    folder: collections
+    format: json
+    extension: json
+    create: true
+    slug: '{{id}}'
+    identifier_field: id
+    summary: '{{id}} - {{title}}'
+
+    fields:
+      - label: 'Type'
+        name: 'type'
+        widget: 'hidden'
+        default: 'Collection'
+
+      - label: 'STAC Version'
+        name: 'stac_version'
+        widget: 'hidden'
+        default: '1.1.0'
+
+      - label: 'STAC Extensions'
+        name: 'stac_extensions'
+        widget: 'list'
+        required: false
+        collapsed: true
+        field:
+          label: 'Extension URL'
+          name: 'extension'
+          widget: 'string'
+
+      - label: 'ID'
+        name: 'id'
+        widget: 'string'
+        required: true
+        hint: 'Unique identifier for this collection'
+        pattern: ['^[a-zA-Z0-9_-]+$', 'Must contain only alphanumeric characters, hyphens, and underscores']
+
+      - label: 'Title'
+        name: 'title'
+        widget: 'string'
+        required: true
+
+      - label: 'Description'
+        name: 'description'
+        widget: 'text'
+        required: true
+
+      - label: 'Keywords'
+        name: 'keywords'
+        widget: 'list'
+        required: false
+        field:
+          label: 'Keyword'
+          name: 'keyword'
+          widget: 'string'
+
+      - label: 'License'
+        name: 'license'
+        widget: 'select'
+        required: true
+        options:
+          - { label: 'Creative Commons Attribution 4.0', value: 'CC-BY-4.0' }
+          - { label: 'Creative Commons Zero (Public Domain)', value: 'CC0-1.0' }
+          - { label: 'MIT License', value: 'MIT' }
+          - { label: 'Apache 2.0', value: 'Apache-2.0' }
+          - { label: 'Proprietary', value: 'proprietary' }
+          - { label: 'Various', value: 'various' }
+        default: 'CC-BY-4.0'
+
+      # Extent
+      - label: 'Extent'
+        name: 'extent'
+        widget: 'object'
+        required: true
+        fields:
+          - label: 'Spatial Extent'
+            name: 'spatial'
+            widget: 'object'
+            required: true
+            fields:
+              - label: 'Bounding Boxes'
+                name: 'bbox'
+                widget: 'list'
+                required: true
+                hint: 'One or more bounding boxes'
+                field:
+                  label: 'Bounding Box'
+                  name: 'bounds'
+                  widget: 'list'
+                  hint: '[minLon, minLat, maxLon, maxLat]'
+                  field:
+                    label: 'Coordinate'
+                    name: 'coord'
+                    widget: 'number'
+                    value_type: 'float'
+
+          - label: 'Temporal Extent'
+            name: 'temporal'
+            widget: 'object'
+            required: true
+            fields:
+              - label: 'Intervals'
+                name: 'interval'
+                widget: 'list'
+                required: true
+                hint: 'One or more time intervals'
+                field:
+                  label: 'Time Range'
+                  name: 'range'
+                  widget: 'list'
+                  hint: '[start_datetime, end_datetime] - use null for open-ended'
+                  field:
+                    label: 'DateTime'
+                    name: 'dt'
+                    widget: 'string'
+                    required: false
+
+      # Providers
+      - label: 'Providers'
+        name: 'providers'
+        widget: 'list'
+        required: false
+        summary: '{{fields.name}}'
+        fields:
+          - { label: 'Name', name: 'name', widget: 'string', required: true }
+          - { label: 'Description', name: 'description', widget: 'text', required: false }
+          - { label: 'URL', name: 'url', widget: 'string', required: false }
+          - label: 'Roles'
+            name: 'roles'
+            widget: 'select'
+            multiple: true
+            options:
+              - { label: 'Producer', value: 'producer' }
+              - { label: 'Licensor', value: 'licensor' }
+              - { label: 'Processor', value: 'processor' }
+              - { label: 'Host', value: 'host' }
+
+      # Links
+      - label: 'Links'
+        name: 'links'
+        widget: 'list'
+        required: true
+        summary: '{{fields.rel}}: {{fields.title}}'
+        fields:
+          - label: 'Relation Type'
+            name: 'rel'
+            widget: 'select'
+            options:
+              - { label: 'Root', value: 'root' }
+              - { label: 'Self', value: 'self' }
+              - { label: 'Item', value: 'item' }
+              - { label: 'Child', value: 'child' }
+              - { label: 'Parent', value: 'parent' }
+              - { label: 'License', value: 'license' }
+          - { label: 'URL', name: 'href', widget: 'string', required: true }
+          - { label: 'Media Type', name: 'type', widget: 'string', default: 'application/json' }
+          - { label: 'Title', name: 'title', widget: 'string', required: false }
+
+      # Summaries (optional)
+      - label: 'Summaries'
+        name: 'summaries'
+        widget: 'code'
+        required: false
+        default_language: 'json'
+        allow_language_selection: false
+        hint: 'Summary statistics as JSON object (e.g., {"gsd": {"minimum": 0.5, "maximum": 1.0}})'
+
+  # ============================================
+  # STAC Catalogs
+  # ============================================
+  - name: stac-catalogs
+    label: 'STAC Catalogs'
+    label_singular: 'STAC Catalog'
+    description: 'Top-level organizational structure for STAC'
+    folder: catalog
+    format: json
+    extension: json
+    create: true
+    slug: '{{id}}'
+    identifier_field: id
+    summary: '{{id}} - {{title}}'
+
+    fields:
+      - label: 'Type'
+        name: 'type'
+        widget: 'hidden'
+        default: 'Catalog'
+
+      - label: 'STAC Version'
+        name: 'stac_version'
+        widget: 'hidden'
+        default: '1.1.0'
+
+      - label: 'ID'
+        name: 'id'
+        widget: 'string'
+        required: true
+        pattern: ['^[a-zA-Z0-9_-]+$', 'Must contain only alphanumeric characters, hyphens, and underscores']
+
+      - label: 'Title'
+        name: 'title'
+        widget: 'string'
+        required: true
+
+      - label: 'Description'
+        name: 'description'
+        widget: 'text'
+        required: true
+
+      - label: 'Links'
+        name: 'links'
+        widget: 'list'
+        required: true
+        summary: '{{fields.rel}}: {{fields.title}}'
+        fields:
+          - label: 'Relation Type'
+            name: 'rel'
+            widget: 'select'
+            options:
+              - { label: 'Root', value: 'root' }
+              - { label: 'Self', value: 'self' }
+              - { label: 'Child', value: 'child' }
+              - { label: 'Item', value: 'item' }
+          - { label: 'URL', name: 'href', widget: 'string', required: true }
+          - { label: 'Media Type', name: 'type', widget: 'string', default: 'application/json' }
+          - { label: 'Title', name: 'title', widget: 'string', required: false }

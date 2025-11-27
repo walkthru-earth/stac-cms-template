@@ -1,0 +1,66 @@
+{
+  "type": "Feature",
+  "stac_version": "1.1.0",
+  "stac_extensions": [],
+  "id": "sf-bay-area-example-001",
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [-122.5, 37.7],
+        [-122.4, 37.7],
+        [-122.4, 37.8],
+        [-122.5, 37.8],
+        [-122.5, 37.7]
+      ]
+    ]
+  },
+  "bbox": [-122.5, 37.7, -122.4, 37.8],
+  "properties": {
+    "datetime": "2024-11-27T10:00:00Z",
+    "title": "San Francisco Bay Area Example",
+    "description": "Example STAC item showing satellite imagery coverage of the San Francisco Bay Area. This demonstrates the basic structure of a STAC Item.",
+    "created": "2024-11-27T10:00:00Z",
+    "updated": "2024-11-27T10:00:00Z"
+  },
+  "collection": "example-collection",
+  "links": [
+    {
+      "rel": "root",
+      "href": "../catalog.json",
+      "type": "application/json",
+      "title": "Root catalog"
+    },
+    {
+      "rel": "parent",
+      "href": "../collections/example-collection.json",
+      "type": "application/json",
+      "title": "Example Collection"
+    },
+    {
+      "rel": "collection",
+      "href": "../collections/example-collection.json",
+      "type": "application/json",
+      "title": "Example Collection"
+    },
+    {
+      "rel": "self",
+      "href": "http://localhost:8000/items/example-item.json",
+      "type": "application/geo+json"
+    }
+  ],
+  "assets": {
+    "thumbnail": {
+      "href": "https://via.placeholder.com/300x200.png?text=SF+Bay+Area",
+      "title": "Thumbnail",
+      "type": "image/png",
+      "roles": ["thumbnail"]
+    },
+    "visual": {
+      "href": "https://via.placeholder.com/1024x768.jpg?text=San+Francisco+Bay+Area+Satellite+Image",
+      "title": "Visual RGB Composite",
+      "type": "image/jpeg",
+      "roles": ["visual"]
+    }
+  }
+}
