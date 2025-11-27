@@ -6,13 +6,15 @@ backend:
   name: github
   repo: walkthru-earth/stac-cms-template
   branch: main
+  base_url: https://opensensor-auth.walkthru-earth.workers.dev
+  auth_endpoint: /auth
 
 # Optional: Use the test-repo backend for local development
 # backend:
 #   name: test-repo
 
 # Site Configuration
-site_url: http://walkthru.earth/stac-cms-template
+site_url: https://walkthru.earth/stac-cms-template
 
 # Publishing Mode
 publish_mode: editorial_workflow  # Enables draft/review workflow
