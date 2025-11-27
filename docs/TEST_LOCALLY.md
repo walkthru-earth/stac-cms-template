@@ -74,16 +74,25 @@ http://localhost:8000/admin/index-local.html
 4. Click "Validate"
 5. Should see: ✅ "Valid STAC!"
 
-**Option B: Command Line (If you have Python)**
+**Option B: Command Line (Recommended: uv)**
 
 ```bash
+# Install uv (one-time)
+curl -LsSf https://astral.sh/uv/install.sh | sh
+
 # Install validator
-pip install stac-validator
+uv tool install stac-validator
 
 # Save your JSON to a file
 # items/test-001.json
 
 # Validate
+uvx stac-validator items/test-001.json
+```
+
+**Alternative: pip (slower)**
+```bash
+pip install stac-validator
 stac-validator items/test-001.json
 ```
 

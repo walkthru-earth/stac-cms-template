@@ -77,21 +77,34 @@ Authenticate with GitHub and start editing!
 
 ```
 stac-cms-template/
-├── admin/
+├── admin/                  # CMS Interface
 │   ├── index.html          # CMS entry point
-│   └── config.yml          # CMS configuration
-├── catalog/
-│   └── root.json           # Root STAC Catalog
-├── collections/
+│   ├── config.yml          # CMS configuration
+│   └── stac-format.js      # Custom geometry format handler
+├── docs/                   # 📚 Documentation
+│   ├── STAC-RELATIONSHIPS.md
+│   ├── SETUP_GUIDE.md
+│   ├── TEST_LOCALLY.md
+│   └── IMPLEMENTATION_SUMMARY.md
+├── catalog/                # Editable STAC Catalogs (CMS managed)
+│   └── root.json           # Main catalog (editable)
+├── collections/            # STAC Collections
 │   └── example-collection.json
-├── items/
+├── items/                  # STAC Items
 │   └── example-item.json
 ├── assets/                 # Media uploads
-├── .github/
-│   └── workflows/
-│       └── validate-stac.yml  # Auto-validation
-└── README.md
+├── .github/workflows/      # CI/CD
+│   └── validate-stac.yml   # Auto-validation
+├── catalog.json            # 🌟 STAC root (auto-copied from catalog/root.json)
+└── README.md               # Project documentation
 ```
+
+**Key Points:**
+- 🌟 `catalog.json` - Published root catalog (auto-copied for STAC compliance)
+- 📝 `catalog/root.json` - Editable version (managed via CMS)
+- 📚 `docs/` - All documentation files
+- 🎨 `admin/` - CMS interface and configuration
+- 📦 STAC data organized in standard folders
 
 ---
 
@@ -333,7 +346,10 @@ All work out of the box - just connect and deploy! ✨
 ## 📚 Documentation
 
 ### This Repository
-- [**STAC Relationship Management Guide**](STAC-RELATIONSHIPS.md) - Complete guide to managing catalog/collection/item relationships
+- [**STAC Relationship Management Guide**](docs/STAC-RELATIONSHIPS.md) - Complete guide to managing catalog/collection/item relationships
+- [**Setup Guide**](docs/SETUP_GUIDE.md) - Detailed setup and configuration instructions
+- [**Local Testing Guide**](docs/TEST_LOCALLY.md) - How to test the CMS locally
+- [**Implementation Summary**](docs/IMPLEMENTATION_SUMMARY.md) - Technical implementation details
 
 ### External Resources
 - [STAC Specification](https://stacspec.org/en/about/stac-spec/)

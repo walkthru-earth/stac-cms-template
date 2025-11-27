@@ -313,15 +313,27 @@ The GitHub Action is already configured! It will:
 
 ### Test Validation Locally
 
+**Recommended: Use uv (10-100x faster)**
+
 ```bash
+# Install uv (one-time setup)
+curl -LsSf https://astral.sh/uv/install.sh | sh
+
 # Install validator
-pip install stac-validator
+uv tool install stac-validator
 
 # Validate a file
-stac-validator items/test-item-001.json
+uvx stac-validator items/test-item-001.json
 
 # Validate all files
-find . -name "*.json" -not -path "./node_modules/*" -exec stac-validator {} \;
+find . -name "*.json" -not -path "./node_modules/*" -exec uvx stac-validator {} \;
+```
+
+**Alternative: Use pip (slower)**
+
+```bash
+pip install stac-validator
+stac-validator items/test-item-001.json
 ```
 
 ---
