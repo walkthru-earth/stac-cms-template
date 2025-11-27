@@ -118,13 +118,29 @@ All STAC-required fields are pre-configured:
 
 ### Validation
 
-GitHub Actions automatically validate all STAC JSON files on commit:
+GitHub Actions automatically validate all STAC JSON files on commit using **uv** (10-100x faster than pip):
+
 ```bash
-# Validates against STAC v1.1.0 specification
-stac-validator items/*.json
-stac-validator collections/*.json
-stac-validator catalog/*.json
+# Install validator with uv (fast Python package manager)
+uv tool install stac-validator
+
+# Validate against STAC v1.1.0 specification
+uvx stac-validator items/*.json
+uvx stac-validator collections/*.json
+uvx stac-validator catalog/*.json
 ```
+
+**Why uv?**
+- ⚡ 10-100x faster than pip
+- 🔒 Better dependency resolution
+- 📦 Minimal disk space usage
+- ✅ Industry best practice for Python tooling
+
+**Geometry Handling:**
+The map widget stores geometry as strings, but STAC requires objects. This is handled automatically by our custom format (`admin/stac-format.js`):
+- **On save**: String → Object (STAC compliant)
+- **On load**: Object → String (map widget compatible)
+- Files in Git are always STAC-compliant ✅
 
 ---
 
@@ -255,17 +271,32 @@ Validation runs automatically on:
 
 ### Manual (Local)
 
+**Recommended: Use uv (faster)**
+
 ```bash
-# Install validator
+# Install uv (one-time setup)
+curl -LsSf https://astral.sh/uv/install.sh | sh
+
+# Install validator with uv
+uv tool install stac-validator
+
+# Validate files
+uvx stac-validator items/my-item.json
+uvx stac-validator collections/my-collection.json
+uvx stac-validator catalog/root.json
+
+# Validate entire catalog
+find . -name "*.json" -not -path "./node_modules/*" -exec uvx stac-validator {} \;
+```
+
+**Alternative: Use pip (slower)**
+
+```bash
+# Install validator with pip
 pip install stac-validator
 
 # Validate files
 stac-validator items/my-item.json
-stac-validator collections/my-collection.json
-stac-validator catalog/root.json
-
-# Validate entire catalog
-find . -name "*.json" -not -path "./node_modules/*" -exec stac-validator {} \;
 ```
 
 ---
@@ -301,10 +332,15 @@ All work out of the box - just connect and deploy! ✨
 
 ## 📚 Documentation
 
+### This Repository
+- [**STAC Relationship Management Guide**](STAC-RELATIONSHIPS.md) - Complete guide to managing catalog/collection/item relationships
+
+### External Resources
 - [STAC Specification](https://stacspec.org/en/about/stac-spec/)
 - [Sveltia CMS Documentation](https://github.com/sveltia/sveltia-cms)
 - [STAC Best Practices](https://github.com/radiantearth/stac-spec/blob/master/best-practices.md)
 - [STAC Extensions](https://stac-extensions.github.io/)
+- [uv Documentation](https://github.com/astral-sh/uv)
 
 ---
 
@@ -319,12 +355,14 @@ Contributions welcome! This template is designed to be:
 
 ### Ideas for Improvement
 
-- [ ] Additional STAC Extensions support
-- [ ] Auto-calculate bbox from geometry
-- [ ] Asset preview/upload
+- [ ] Additional STAC Extensions support (eo, view, projection, etc.)
+- [x] Asset preview/upload (✅ Implemented with image widget)
 - [ ] Bulk import from existing STAC catalogs
 - [ ] Custom preview templates
 - [ ] STAC API integration
+- [ ] Auto-generate collection summaries from items
+- [x] Relationship management helpers (✅ Implemented)
+- [x] Custom geometry format handling (✅ Implemented)
 
 ---
 

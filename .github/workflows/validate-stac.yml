@@ -1,5 +1,19 @@
 name: Validate STAC
 
+# This workflow validates all STAC JSON files against the official STAC specification.
+# It runs on:
+# - Pull requests that modify JSON files (to catch errors before merge)
+# - Pushes to main branch that modify JSON files (to validate published data)
+#
+# WHY VALIDATION IS IMPORTANT:
+# - Ensures STAC spec compliance (items, collections, catalogs)
+# - Catches schema errors, missing required fields, invalid formats
+# - Validates geometry objects, bbox coordinates, datetime formats
+# - Confirms links and relationships are properly structured
+#
+# Note: Geometry conversion is handled by custom format in Sveltia CMS (admin/stac-format.js)
+# Files are always saved in STAC-compliant format (geometry as object, not string)
+
 on:
   pull_request:
     paths:
@@ -19,14 +33,18 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Install uv
+      - name: Install uv (fast Python package manager)
         uses: astral-sh/setup-uv@v5
         with:
           enable-cache: true
+        # uv is 10-100x faster than pip and handles dependencies better
+        # https://github.com/astral-sh/uv
 
       - name: Install STAC validator
         run: |
           uv tool install stac-validator
+        # Official STAC validator from stac-utils
+        # https://github.com/stac-utils/stac-validator
 
       - name: Validate STAC Items
         run: |
@@ -90,9 +108,13 @@ jobs:
       - name: Validation successful
         if: success()
         run: |
-          echo "✅ All STAC files are valid!"
+          echo "✅ All STAC files validated successfully!"
+          echo ""
           echo "📁 Catalog structure:"
           echo "   - catalog/root.json (editable via CMS)"
-          echo "   - catalog.json (STAC-compliant root)"
+          echo "   - catalog.json (STAC-compliant root, auto-copied)"
           echo ""
-          echo "ℹ️  Note: Geometry conversion is handled by custom format in Sveltia CMS"
+          echo "ℹ️  Technical notes:"
+          echo "   - Geometry conversion: Handled by admin/stac-format.js (string ↔ object)"
+          echo "   - Validation tool: stac-validator via uv (10-100x faster than pip)"
+          echo "   - STAC spec: All files comply with STAC 1.1.0 specification"
