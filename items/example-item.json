@@ -3,7 +3,33 @@
   "stac_version": "1.1.0",
   "stac_extensions": [],
   "id": "sf-bay-area-example-001",
-  "geometry": "{\"type\":\"Polygon\",\"coordinates\":[[[42.890625,9.102097],[0.703125,35.46067],[-30.9375,4.915833],[19.6875,-16.636192],[42.890625,9.102097]]]}",
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          42.890625,
+          9.102097
+        ],
+        [
+          0.703125,
+          35.46067
+        ],
+        [
+          -30.9375,
+          4.915833
+        ],
+        [
+          19.6875,
+          -16.636192
+        ],
+        [
+          42.890625,
+          9.102097
+        ]
+      ]
+    ]
+  },
   "bbox": [
     -122.5,
     37.7,
@@ -14,8 +40,6 @@
     "datetime": "2024-11-27T10:00:00Z",
     "title": "San Francisco Bay Area Example",
     "description": "Example STAC item showing satellite imagery coverage of the San Francisco Bay Area. This demonstrates the basic structure of a STAC Item.",
-    "start_datetime": "",
-    "end_datetime": "",
     "created": "2024-11-27T10:00:00Z",
     "updated": "2024-11-27T10:00:00Z"
   },
@@ -41,15 +65,13 @@
     {
       "rel": "self",
       "href": "https://walkthru.earth/stac-cms-template/items/example-item.json",
-      "type": "application/geo+json",
-      "title": ""
+      "type": "application/geo+json"
     }
   ],
   "assets": {
     "visual": {
       "href": "/assets/small logo.png",
       "title": "Visual RGB Composite",
-      "description": "",
       "type": "image/jpeg",
       "roles": [
         "visual"
@@ -58,7 +80,6 @@
     "thumbnail": {
       "href": "/assets/small logo.png",
       "title": "Thumbnail",
-      "description": "",
       "type": "image/png",
       "roles": [
         "thumbnail"

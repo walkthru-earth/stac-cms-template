@@ -28,6 +28,21 @@ jobs:
         run: |
           uv tool install stac-validator
 
+      - name: Fix stringified geometry in STAC Items
+        run: |
+          echo "🔧 Converting stringified geometry to JSON objects..."
+          python3 .github/scripts/fix-geometry.py
+          GEOMETRY_FIX_EXIT=$?
+
+          if [ $GEOMETRY_FIX_EXIT -eq 2 ]; then
+            echo "✅ Geometry fields were fixed and will be committed"
+          elif [ $GEOMETRY_FIX_EXIT -eq 0 ]; then
+            echo "✓ All geometry fields already valid"
+          else
+            echo "❌ Error fixing geometry fields"
+            exit 1
+          fi
+
       - name: Validate STAC Items
         run: |
           echo "Validating STAC Items..."
@@ -67,21 +82,47 @@ jobs:
             echo "✅ Copied catalog/root.json → catalog.json"
           fi
 
-      - name: Commit catalog.json if changed
+      - name: Commit STAC fixes and updates
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         run: |
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
 
+          # Stage any fixed geometry files
+          git add items/*.json 2>/dev/null || true
+          git add collections/*.json 2>/dev/null || true
+          git add catalog/*.json 2>/dev/null || true
+
+          # Stage catalog.json if it exists
           if [ -f "catalog.json" ]; then
             git add catalog.json
-            if git diff --staged --quiet; then
-              echo "No changes to catalog.json"
-            else
-              git commit -m "Auto-update: Copy catalog/root.json to catalog.json for STAC compliance"
-              git push
-              echo "✅ Published catalog.json to root"
+          fi
+
+          # Commit if there are changes
+          if git diff --staged --quiet; then
+            echo "✓ No changes to commit"
+          else
+            COMMIT_MSG="Auto-fix: "
+            CHANGES=()
+
+            # Check what changed
+            if git diff --staged --name-only | grep -q "items/"; then
+              CHANGES+=("Convert stringified geometry to JSON objects")
             fi
+            if git diff --staged --name-only | grep -q "catalog.json"; then
+              CHANGES+=("Update catalog.json for STAC compliance")
+            fi
+
+            # Build commit message
+            if [ ${#CHANGES[@]} -gt 0 ]; then
+              COMMIT_MSG+=$(IFS=", "; echo "${CHANGES[*]}")
+            else
+              COMMIT_MSG+="Update STAC files"
+            fi
+
+            git commit -m "$COMMIT_MSG"
+            git push
+            echo "✅ Committed and pushed STAC fixes"
           fi
 
       - name: Validation successful
