@@ -19,14 +19,14 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
         with:
-          python-version: '3.11'
+          enable-cache: true
 
       - name: Install STAC validator
         run: |
-          pip install stac-validator
+          uv tool install stac-validator
 
       - name: Validate STAC Items
         run: |
@@ -34,7 +34,7 @@ jobs:
           for file in items/*.json; do
             if [ -f "$file" ]; then
               echo "Validating $file"
-              stac-validator "$file" || exit 1
+              uvx stac-validator "$file" || exit 1
             fi
           done
 
@@ -44,7 +44,7 @@ jobs:
           for file in collections/*.json; do
             if [ -f "$file" ]; then
               echo "Validating $file"
-              stac-validator "$file" || exit 1
+              uvx stac-validator "$file" || exit 1
             fi
           done
 
@@ -54,11 +54,40 @@ jobs:
           for file in catalog/*.json; do
             if [ -f "$file" ]; then
               echo "Validating $file"
-              stac-validator "$file" || exit 1
+              uvx stac-validator "$file" || exit 1
             fi
           done
+
+      - name: Copy root catalog to STAC-compliant location
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        run: |
+          echo "📦 Creating STAC-compliant catalog structure..."
+          if [ -f "catalog/root.json" ]; then
+            cp catalog/root.json catalog.json
+            echo "✅ Copied catalog/root.json → catalog.json"
+          fi
+
+      - name: Commit catalog.json if changed
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+
+          if [ -f "catalog.json" ]; then
+            git add catalog.json
+            if git diff --staged --quiet; then
+              echo "No changes to catalog.json"
+            else
+              git commit -m "Auto-update: Copy catalog/root.json to catalog.json for STAC compliance"
+              git push
+              echo "✅ Published catalog.json to root"
+            fi
+          fi
 
       - name: Validation successful
         if: success()
         run: |
           echo "✅ All STAC files are valid!"
+          echo "📁 Catalog structure:"
+          echo "   - catalog/root.json (editable via CMS)"
+          echo "   - catalog.json (STAC-compliant root)"
