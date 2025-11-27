@@ -84,6 +84,8 @@ collections:
         name: 'bbox'
         widget: 'list'
         required: true
+        min: 4
+        max: 6
         hint: 'Format: [minLon, minLat, maxLon, maxLat] or [minLon, minLat, minElev, maxLon, maxLat, maxElev]'
         summary: '[{{fields.coordinate}}]'
         field:
@@ -92,6 +94,8 @@ collections:
           widget: 'number'
           value_type: 'float'
           step: 0.000001
+          min: -180
+          max: 180
 
       # Properties Object
       - label: 'Properties'
@@ -212,6 +216,8 @@ collections:
               - label: 'Roles'
                 name: 'roles'
                 widget: 'list'
+                required: false
+                min: 1
                 default: ['visual']
                 field: { label: 'Role', name: 'role', widget: 'string' }
 
@@ -234,6 +240,8 @@ collections:
               - label: 'Roles'
                 name: 'roles'
                 widget: 'list'
+                required: false
+                min: 1
                 default: ['thumbnail']
                 field: { label: 'Role', name: 'role', widget: 'string' }
 
@@ -249,6 +257,8 @@ collections:
               - label: 'Roles'
                 name: 'roles'
                 widget: 'list'
+                required: false
+                min: 1
                 default: ['metadata']
                 field: { label: 'Role', name: 'role', widget: 'string' }
 
