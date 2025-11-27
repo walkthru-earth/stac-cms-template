@@ -151,43 +151,53 @@ collections:
             format: 'YYYY-MM-DDTHH:mm:ssZ'
             hint: 'Last update date of the metadata'
 
-      # Links Array
+      # ============================================
+      # LINKS - STAC Navigation Structure
+      # ============================================
+
       - label: 'Links'
         name: 'links'
         widget: 'list'
         required: true
         collapsed: false
-        summary: '{{fields.rel}}: {{fields.title}}'
-        hint: 'Links to related resources'
+        summary: '{{fields.rel}}: {{fields.title}} → {{fields.href}}'
+        hint: 'STAC link relationships. STRONGLY RECOMMENDED: Include self, root, parent, collection links for proper navigation.'
         fields:
           - label: 'Relation Type'
             name: 'rel'
             widget: 'select'
             required: true
             options:
-              - { label: 'Self', value: 'self' }
-              - { label: 'Root', value: 'root' }
-              - { label: 'Parent', value: 'parent' }
-              - { label: 'Collection', value: 'collection' }
-              - { label: 'Item', value: 'item' }
+              - { label: 'Self (this item URL)', value: 'self' }
+              - { label: 'Root (main catalog)', value: 'root' }
+              - { label: 'Parent (parent catalog/collection)', value: 'parent' }
+              - { label: 'Collection (parent collection - REQUIRED)', value: 'collection' }
+              - { label: 'Related Item', value: 'item' }
               - { label: 'Derived From', value: 'derived_from' }
               - { label: 'License', value: 'license' }
+            hint: '✅ AUTOMATIC: "Collection" is auto-set by relation widget above. Recommended: Add self, root, parent links for navigation.'
 
-          - label: 'URL'
+          - label: 'URL (href)'
             name: 'href'
             widget: 'string'
             required: true
+            hint: 'Relative path examples: ../catalog.json (root), ../collections/my-collection.json (collection), or absolute URL'
 
           - label: 'Media Type'
             name: 'type'
-            widget: 'string'
+            widget: 'select'
             default: 'application/json'
             required: false
+            options:
+              - { label: 'application/json (Catalog/Collection)', value: 'application/json' }
+              - { label: 'application/geo+json (Item)', value: 'application/geo+json' }
+              - { label: 'text/html', value: 'text/html' }
 
           - label: 'Title'
             name: 'title'
             widget: 'string'
             required: false
+            hint: 'Human-readable title - should match the title of the linked entity'
 
       # Assets Object (using key-value widget for better UX)
       - label: 'Assets'
@@ -262,7 +272,10 @@ collections:
                 default: ['metadata']
                 field: { label: 'Role', name: 'role', widget: 'string' }
 
-      # Collection Reference
+      # ============================================
+      # COLLECTION REFERENCE - AUTOMATIC RELATIONSHIP
+      # ============================================
+
       - label: 'Collection'
         name: 'collection'
         widget: 'relation'
@@ -271,7 +284,7 @@ collections:
         value_field: 'id'
         display_fields: ['title']
         required: false
-        hint: 'Link to the parent STAC Collection'
+        hint: '✅ AUTOMATIC: Select parent collection from dropdown. Stores collection ID and auto-creates collection link. ⚠️ MANUAL STEP REQUIRED: You must also add this item as an "item" link in the parent collection!'
 
   # ============================================
   # STAC Collections
@@ -416,26 +429,79 @@ collections:
               - { label: 'Processor', value: 'processor' }
               - { label: 'Host', value: 'host' }
 
-      # Links
+      # ============================================
+      # RELATIONSHIP HELPERS
+      # These fields help manage STAC relationships
+      # ============================================
+
+      - label: 'Parent Catalog (Quick Add)'
+        name: '_parent_catalog_helper'
+        widget: 'relation'
+        collection: 'stac-catalogs'
+        search_fields: ['id', 'title']
+        value_field: 'id'
+        display_fields: ['title', 'id']
+        required: false
+        hint: "⚠️ MANUAL LINK REQUIRED: Select the parent catalog, then add a 'parent' link below with href: ../catalog/[catalog-id].json. Remember to also add this collection as a 'child' link in the parent catalog!"
+
+      - label: 'Items in This Collection (Quick Reference)'
+        name: '_items_helper'
+        widget: 'relation'
+        collection: 'stac-items'
+        search_fields: ['id', 'properties.title']
+        value_field: 'id'
+        display_fields: ['properties.title', 'id']
+        multiple: true
+        required: false
+        filters:
+          - field: 'collection'
+            values: ['{{id}}']
+        hint: "⚠️ MANUAL LINKS REQUIRED: These items reference this collection. You must manually add 'item' links below for each one with href: ../items/[item-id].json"
+
+      # ============================================
+      # LINKS - STAC Navigation Structure
+      # ============================================
+
       - label: 'Links'
         name: 'links'
         widget: 'list'
         required: true
-        summary: '{{fields.rel}}: {{fields.title}}'
+        summary: '{{fields.rel}}: {{fields.title}} → {{fields.href}}'
+        hint: 'STAC link relationships. STRONGLY RECOMMENDED: Include self, root, parent links. REQUIRED: Add "item" link for each item in this collection (see helper above).'
         fields:
           - label: 'Relation Type'
             name: 'rel'
             widget: 'select'
+            required: true
             options:
-              - { label: 'Root', value: 'root' }
-              - { label: 'Self', value: 'self' }
-              - { label: 'Item', value: 'item' }
-              - { label: 'Child', value: 'child' }
-              - { label: 'Parent', value: 'parent' }
+              - { label: 'Self (this collection URL)', value: 'self' }
+              - { label: 'Root (main catalog)', value: 'root' }
+              - { label: 'Parent (parent catalog)', value: 'parent' }
+              - { label: 'Item (item in this collection)', value: 'item' }
+              - { label: 'Child (sub-collection - rare)', value: 'child' }
               - { label: 'License', value: 'license' }
-          - { label: 'URL', name: 'href', widget: 'string', required: true }
-          - { label: 'Media Type', name: 'type', widget: 'string', default: 'application/json' }
-          - { label: 'Title', name: 'title', widget: 'string', required: false }
+            hint: 'self = this collection, root = main catalog, parent = parent catalog/collection, item = items belonging to this collection'
+
+          - label: 'URL (href)'
+            name: 'href'
+            widget: 'string'
+            required: true
+            hint: 'Relative path examples: ../catalog.json (parent), ../items/my-item.json (item), or absolute URL'
+
+          - label: 'Media Type'
+            name: 'type'
+            widget: 'select'
+            default: 'application/json'
+            options:
+              - { label: 'application/json (Catalog/Collection)', value: 'application/json' }
+              - { label: 'application/geo+json (Item)', value: 'application/geo+json' }
+              - { label: 'text/html', value: 'text/html' }
+
+          - label: 'Title'
+            name: 'title'
+            widget: 'string'
+            required: false
+            hint: 'Human-readable title - should match the title of the linked entity'
 
       # Summaries (optional)
       - label: 'Summaries'
@@ -488,20 +554,85 @@ collections:
         widget: 'text'
         required: true
 
+      # ============================================
+      # RELATIONSHIP HELPERS
+      # These fields help manage STAC relationships
+      # ============================================
+
+      - label: 'Child Collections (Quick Add)'
+        name: '_child_collections_helper'
+        widget: 'relation'
+        collection: 'stac-collections'
+        search_fields: ['id', 'title']
+        value_field: 'id'
+        display_fields: ['title', 'id']
+        multiple: true
+        required: false
+        hint: "Select collections to link as children. This helps you quickly add child links below. Note: This is a helper field - actual links are managed in the 'Links' section below."
+
+      - label: 'Child Catalogs (Quick Add)'
+        name: '_child_catalogs_helper'
+        widget: 'relation'
+        collection: 'stac-catalogs'
+        search_fields: ['id', 'title']
+        value_field: 'id'
+        display_fields: ['title', 'id']
+        multiple: true
+        required: false
+        hint: "Select sub-catalogs to link as children. This helps you quickly add child links below. Note: This is a helper field - actual links are managed in the 'Links' section below."
+
+      - label: 'Parent Catalog (Optional)'
+        name: '_parent_catalog_helper'
+        widget: 'relation'
+        collection: 'stac-catalogs'
+        search_fields: ['id', 'title']
+        value_field: 'id'
+        display_fields: ['title', 'id']
+        required: false
+        hint: "If this is a sub-catalog, select its parent catalog. Note: This is a helper field - you must also add a 'parent' link below."
+
+      # ============================================
+      # LINKS - STAC Navigation Structure
+      # ============================================
+
       - label: 'Links'
         name: 'links'
         widget: 'list'
         required: true
-        summary: '{{fields.rel}}: {{fields.title}}'
+        summary: '{{fields.rel}}: {{fields.title}} → {{fields.href}}'
+        hint: 'STAC link relationships for navigation. STRONGLY RECOMMENDED: Include self, root links. Add child links for collections/sub-catalogs, parent link if this is a sub-catalog.'
         fields:
           - label: 'Relation Type'
             name: 'rel'
             widget: 'select'
+            required: true
             options:
-              - { label: 'Root', value: 'root' }
-              - { label: 'Self', value: 'self' }
-              - { label: 'Child', value: 'child' }
-              - { label: 'Item', value: 'item' }
-          - { label: 'URL', name: 'href', widget: 'string', required: true }
-          - { label: 'Media Type', name: 'type', widget: 'string', default: 'application/json' }
-          - { label: 'Title', name: 'title', widget: 'string', required: false }
+              - { label: 'Self (this catalog URL)', value: 'self' }
+              - { label: 'Root (main catalog)', value: 'root' }
+              - { label: 'Parent (parent catalog)', value: 'parent' }
+              - { label: 'Child (sub-catalog or collection)', value: 'child' }
+              - { label: 'Item (direct item link - rare)', value: 'item' }
+              - { label: 'License', value: 'license' }
+            hint: 'self = this catalog, root = main catalog, parent = parent catalog, child = sub-catalog or collection'
+
+          - label: 'URL (href)'
+            name: 'href'
+            widget: 'string'
+            required: true
+            hint: 'Use relative paths (e.g., ./catalog.json, ../collections/my-collection.json) or absolute URLs (https://...)'
+
+          - label: 'Media Type'
+            name: 'type'
+            widget: 'select'
+            default: 'application/json'
+            options:
+              - { label: 'application/json (Catalog/Collection)', value: 'application/json' }
+              - { label: 'application/geo+json (Item)', value: 'application/geo+json' }
+              - { label: 'text/html', value: 'text/html' }
+            hint: 'Use application/json for Catalogs and Collections, application/geo+json for Items'
+
+          - label: 'Title'
+            name: 'title'
+            widget: 'string'
+            required: false
+            hint: 'Human-readable title - should match the title of the linked entity'
