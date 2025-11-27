@@ -4,22 +4,42 @@
   "id": "example-collection",
   "title": "Example Satellite Imagery Collection",
   "description": "A sample collection of satellite imagery demonstrating the STAC specification. This collection includes example items with geospatial footprints.",
-  "keywords": ["example", "satellite", "imagery", "demo"],
+  "keywords": [
+    "example",
+    "satellite",
+    "imagery",
+    "demo"
+  ],
   "license": "CC-BY-4.0",
   "providers": [
     {
       "name": "STAC CMS Template",
       "description": "Example data for demonstrating STAC metadata authoring",
-      "roles": ["producer", "licensor"],
+      "roles": [
+        "producer",
+        "licensor"
+      ],
       "url": "https://github.com/walkthru-earth/stac-cms-template"
     }
   ],
   "extent": {
     "spatial": {
-      "bbox": [[-122.5, 37.7, -122.4, 37.8]]
+      "bbox": [
+        [
+          -122.5,
+          37.7,
+          -122.4,
+          37.8
+        ]
+      ]
     },
     "temporal": {
-      "interval": [["2024-01-01T00:00:00Z", "2024-12-31T23:59:59Z"]]
+      "interval": [
+        [
+          "2024-01-01T00:00:00Z",
+          "2024-12-31T23:59:59Z"
+        ]
+      ]
     }
   },
   "links": [
@@ -37,7 +57,7 @@
     },
     {
       "rel": "self",
-      "href": "./example-collection.json",
+      "href": "https://walkthru.earth/stac-cms-template/collections/example-collection.json",
       "type": "application/json"
     },
     {

@@ -64,7 +64,7 @@
     },
     {
       "rel": "self",
-      "href": "./example-item.json",
+      "href": "https://walkthru.earth/stac-cms-template/items/example-item.json",
       "type": "application/geo+json"
     }
   ],
