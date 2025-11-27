@@ -406,6 +406,176 @@ Add to your README:
 
 ---
 
+## Advanced Sveltia CMS Customization
+
+### Custom Format Handlers
+
+**Problem**: Map widget stores geometry as STRING, but STAC requires geometry as OBJECT.
+
+**Solution**: Use `CMS.registerCustomFormat()` to handle round-trip conversion.
+
+**Implementation** (`admin/stac-format.js`):
+```javascript
+const fromFile = (text) => {
+  const data = JSON.parse(text);
+  if (data.type === 'Feature' && data.geometry) {
+    // Convert OBJECT → STRING for map widget
+    if (typeof data.geometry === 'object') {
+      data.geometry = JSON.stringify(data.geometry);
+    }
+  }
+  return data;
+};
+
+const toFile = (data) => {
+  const output = JSON.parse(JSON.stringify(data));
+  if (output.type === 'Feature' && output.geometry) {
+    // Convert STRING → OBJECT for STAC spec
+    if (typeof output.geometry === 'string') {
+      output.geometry = JSON.parse(output.geometry);
+    }
+  }
+  return JSON.stringify(output, null, 2);
+};
+
+CMS.registerCustomFormat('stac-json', 'json', { fromFile, toFile });
+```
+
+**Usage in config.yml**:
+```yaml
+collections:
+  - name: stac-items
+    format: stac-json  # Use custom format
+```
+
+### Unidirectional Relations
+
+**Limitation**: Sveltia CMS relation widgets are unidirectional - they don't auto-create reverse links.
+
+**Example**:
+- Item → Collection (automatic via dropdown)
+- Collection → Item (manual - must add link)
+
+**Solution**: Add helper relation fields to show related entities:
+
+```yaml
+# In Collections - show items that reference this collection
+- label: 'Items in This Collection (Quick Reference)'
+  name: 'helper_items'
+  widget: 'relation'
+  collection: 'stac-items'
+  multiple: true
+  search_fields: ['id', 'properties.title']
+  value_field: 'id'
+  display_fields: ['id']
+  filters:
+    - field: 'collection'
+      values: ['{{id}}']
+  hint: '📋 Items that reference this collection'
+```
+
+### Media Folder Paths for GitHub Pages
+
+**Problem**: Default `/assets` path doesn't work with GitHub Pages base path.
+
+**Solution**: Include repository name in `public_folder`:
+
+```yaml
+media_folder: assets
+public_folder: /YOUR-REPO/assets  # Include repo name!
+```
+
+**Why**: GitHub Pages serves at `https://user.github.io/repo-name/`, not at root.
+
+### Hidden Fields
+
+Auto-populate fields that users shouldn't edit:
+
+```yaml
+- label: 'Type'
+  name: 'type'
+  widget: 'hidden'
+  default: 'Feature'
+
+- label: 'STAC Version'
+  name: 'stac_version'
+  widget: 'hidden'
+  default: '1.1.0'
+```
+
+### Validation with uv (Best Practice)
+
+Use `uv` instead of `pip` for 10-100x faster Python package installation:
+
+**GitHub Actions**:
+```yaml
+- name: Install uv
+  uses: astral-sh/setup-uv@v5
+  with:
+    enable-cache: true
+
+- name: Install STAC validator
+  run: uv tool install stac-validator
+
+- name: Validate
+  run: uvx stac-validator items/*.json
+```
+
+**Local**:
+```bash
+# Install uv (one-time)
+curl -LsSf https://astral.sh/uv/install.sh | sh
+
+# Use validator
+uvx stac-validator items/my-item.json
+```
+
+### Local Development (No Proxy!)
+
+Sveltia CMS supports File System Access API - no proxy server needed!
+
+**Steps**:
+1. Start any local server: `python3 -m http.server 8000`
+2. Open `http://localhost:8000/admin/`
+3. Click **"Work with Local Repository"**
+4. Select your folder
+5. Edit files directly!
+
+**No config changes needed** - just works! 🎉
+
+### Bbox Widget Configuration
+
+Allow negative coordinates for global coverage:
+
+```yaml
+- label: 'Bounding Box'
+  name: 'bbox'
+  widget: 'list'
+  min: 4
+  max: 6
+  field:
+    widget: 'number'
+    value_type: 'float'
+    min: -180  # Allow negative!
+    max: 180
+```
+
+### Relation Dropdown Tips
+
+**Best Practice**: Use `search_fields` and `display_fields` for better UX:
+
+```yaml
+- label: 'Collection'
+  name: 'collection'
+  widget: 'relation'
+  collection: 'stac-collections'
+  search_fields: ['id', 'title']  # Search by both
+  value_field: 'id'
+  display_fields: ['title', 'id']  # Show both
+```
+
+---
+
 ## Next Steps
 
 Now that your STAC CMS is set up:

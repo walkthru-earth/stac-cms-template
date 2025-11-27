@@ -24,6 +24,8 @@
 
 ## 🚀 Quick Start
 
+**New to STAC CMS?** Check out our [**5-Minute Quick Start Guide**](docs/QUICK_START.md) with visual diagrams! 📊
+
 ### 1. Use This Template
 
 Click the **"Use this template"** button above to create your own repository, or:
@@ -346,10 +348,10 @@ All work out of the box - just connect and deploy! ✨
 ## 📚 Documentation
 
 ### This Repository
-- [**STAC Relationship Management Guide**](docs/STAC-RELATIONSHIPS.md) - Complete guide to managing catalog/collection/item relationships
+- [**Quick Start Guide**](docs/QUICK_START.md) - 🚀 Get started in 5 minutes with visual diagrams!
 - [**Setup Guide**](docs/SETUP_GUIDE.md) - Detailed setup and configuration instructions
+- [**STAC Relationship Management Guide**](docs/STAC-RELATIONSHIPS.md) - Complete guide to managing catalog/collection/item relationships
 - [**Local Testing Guide**](docs/TEST_LOCALLY.md) - How to test the CMS locally
-- [**Implementation Summary**](docs/IMPLEMENTATION_SUMMARY.md) - Technical implementation details
 
 ### External Resources
 - [STAC Specification](https://stacspec.org/en/about/stac-spec/)
